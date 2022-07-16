@@ -4,7 +4,7 @@
 
 from os import listdir, makedirs
 from os.path import isfile, join, exists
-from . import polib, Translator, json
+from . import polib, google_translator, json
 from . import SUPPORTED_LANGUAGES, __version__
 from collections import defaultdict
 from copy import deepcopy
@@ -37,7 +37,8 @@ class PoTranslator:
     def __init__(self, pot_dir=None, locale_dir=None):
         self.pot_dir = pot_dir
         self.locale_dir = locale_dir
-        self.translator = Translator()
+        # self.translator = Translator()
+        self.translator = google_translator()
         return
 
     def translate(self, file_name, target_lang='auto', src_lang='auto', encoding='utf-8', auto_save=False, compiled=False):
@@ -71,9 +72,14 @@ class PoTranslator:
         if untranslated:
             updated = True
             try:
-                translations = self.translator.translate([elmt.msgid for elmt in untranslated], src=src_lang, dest=target_lang)
-                for entry, translation in zip(untranslated, translations):
-                    entry.msgstr = translation.text
+                # translations = self.translator.translate([elmt.msgid for elmt in untranslated], src=src_lang, dest=target_lang)
+                translations_list = []
+                for elmt in untranslated :
+                    translations_list.append(self.translator.translate(elmt.msgid,lang_tgt='fa'))
+                
+                # translations = self.translator.translate([elmt.msgid for elmt in untranslated], src="en", dest="fa")
+                for entry, translation in zip(untranslated, translations_list):
+                    entry.msgstr = translation
                 po.metadata['Translated-By'] = 'potranslator {0}'.format(__version__)
                 po.metadata['Last-Translator'] = 'potranslator {0}'.format(__version__)
                 po.metadata['Language'] = target_lang
