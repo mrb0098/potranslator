@@ -13,7 +13,7 @@ __status__ = "Production"
 
 import json
 import polib
-from googletrans import Translator
+from google_trans_new import google_translator
 # import importlib_resources
 import pkg_resources
 import platform
